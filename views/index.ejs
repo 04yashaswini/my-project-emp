@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Team Hub</title>
+<style>
+:root{--p:#ff5c8a;--o:#ff9a4d;--c:#fff6e9;--i:#3b2a2f;--g:linear-gradient(135deg,var(--p),var(--o))}
+*{box-sizing:border-box;margin:0;font-family:system-ui,sans-serif}
+body{background:radial-gradient(circle at 8% 0,#ffd6e2,transparent 40%),radial-gradient(circle at 92% 8%,#ffe0c2,transparent 40%),var(--c);color:var(--i);min-height:100vh;padding:clamp(12px,3vw,32px)}
+main{max-width:1100px;margin:auto;display:grid;gap:18px}
+.card{background:#fffc;backdrop-filter:blur(10px);border:1px solid #fff;border-radius:20px;padding:18px;box-shadow:0 10px 30px #ff5c8a22}
+.t,b.t{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:clamp(1.7rem,4vw,2.5rem)}
+.stats,.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.stat small{color:#9a7b76}.stat b{display:block;font-size:1.7rem}
+form{display:flex;flex-wrap:wrap;gap:10px}
+input{flex:1 1 150px;padding:11px 14px;border:1px solid #ffd3bd;border-radius:12px;background:#fff;font-size:.95rem}
+button{border:0;color:#fff;background:var(--g);padding:11px 22px;border-radius:12px;cursor:pointer;font-weight:600;box-shadow:0 6px 16px #ff5c8a44}
+.emp{display:flex;gap:14px;align-items:center;cursor:pointer;transition:.2s}.emp:hover{transform:translateY(-4px)}
+.av{width:58px;height:58px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;font-weight:700;object-fit:cover;flex:none}
+.emp p{font-size:.85rem;color:#9a7b76}.emp h3{font-size:1.05rem}
+.tag{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:99px;background:#ffe3d1;color:#d9531e;font-size:.75rem}
+dialog{border:0;border-radius:22px;padding:24px;background:var(--c);width:min(92vw,380px);margin:auto}
+dialog::backdrop{background:#3b2a2f66;backdrop-filter:blur(3px)}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #ffd3bd}
+</style></head><body><main>
+<header><h1 class="t">✨ Team Hub</h1><p style="color:#9a7b76">Employees, managers & salaries at a glance</p></header>
+
+<section class="stats">
+<% [['👥 Employees',st.n],['💰 Payroll',st.total],['📊 Average',st.avg],['🏆 Highest',st.max]].forEach(([k,v],i)=>{ %>
+<div class="card stat"><small><%= k %></small><b class="t"><%= i?'₹'+Math.round(v).toLocaleString('en-IN'):v %></b></div>
+<% }) %>
+</section>
+
+<section class="card"><form action="/">
+<input name="id" type="number" placeholder="🔍 Search by employee ID" value="<%= id||'' %>" required><button>Search</button>
+<% if(id){ %><a href="/"><button type="button">Clear</button></a><% } %></form></section>
+
+<section class="card"><form action="/add" method="post" enctype="multipart/form-data">
+<% ['name','role','dept','manager'].forEach(f=>{ %><input name="<%= f %>" placeholder="<%= f[0].toUpperCase()+f.slice(1) %>" required><% }) %>
+<input name="salary" type="number" placeholder="Monthly salary ₹" required><input name="photo" type="file" accept="image/*"><button>＋ Add employee</button>
+</form></section>
+
+<section class="grid">
+<% rows.forEach(e=>{ %>
+<div class="card emp" data-e="<%= JSON.stringify(e) %>">
+<% if(e.photo){ %><img class="av" src="/uploads/<%= e.photo %>"><% }else{ %><div class="av"><%= e.name[0] %></div><% } %>
+<div><h3><%= e.name %></h3><p>#<%= e.id %> · <%= e.role %></p><p>Reports to <%= e.manager %></p><span class="tag"><%= e.dept %></span></div></div>
+<% }) %>
+</section>
+<% if(!rows.length){ %><p class="card" style="text-align:center">No employee found 🌸</p><% } %>
+<dialog id="d"></dialog>
+</main>
+<script>
+const d=document.getElementById('d'),f=n=>'₹'+Math.round(n).toLocaleString('en-IN'),x=s=>Object.assign(document.createElement('i'),{textContent:s}).innerHTML;
+document.querySelectorAll('.emp').forEach(c=>c.onclick=()=>{const e=JSON.parse(c.dataset.e),s=+e.salary;
+d.innerHTML=`<h2 class="t">${x(e.name)}</h2><p style="color:#9a7b76;margin-bottom:8px">#${e.id} · ${x(e.role)}</p>`+
+[['Basic',s*.6],['HRA',s*.25],['Allowances',s*.15],['Tax −',s*.1],['PF −',s*.072],['Net pay',s*.828]].map(([k,v])=>`<div class="row"><span>${k}</span><b>${f(v)}</b></div>`).join('')+
+'<form method="dialog" style="margin-top:14px"><button>Close</button></form>';d.showModal()});
+d.onclick=e=>e.target==d&&d.close();
+</script></body></html>

@@ -1,0 +1,5 @@
+[
+  {"id":101,"name":"Aarav Sharma","role":"Frontend Developer","dept":"Engineering","manager":"Neha Verma","salary":65000,"photo":""},
+  {"id":102,"name":"Priya Patel","role":"UI Designer","dept":"Design","manager":"Rohan Mehta","salary":58000,"photo":""},
+  {"id":103,"name":"Kabir Singh","role":"Sales Lead","dept":"Sales","manager":"Neha Verma","salary":72000,"photo":""}
+]
